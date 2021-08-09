@@ -14,3 +14,6 @@ Geschwindigkeitserhöhung
 Neubeginn beu Aufprall gegen ein Hindernis 
 
 Level wird bei erreichen der grünen Linie beendet, erreichte Punkte werden angezeigt
+
+
+***Bemerkung zum Video: das Spiel läuft auf dem Video nicht "flüssig", jedoch liegt das nicht am Spiel selber, sondern an OBS Studio.***
