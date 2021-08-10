@@ -1,5 +1,7 @@
 # CGA-SS21
 
+## Projekt von Meryem Coskun & Lorin Berfin Kilic
+
 ## Featureliste
 Third Person Camera
 
