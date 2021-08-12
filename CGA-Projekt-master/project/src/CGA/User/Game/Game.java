@@ -85,7 +85,7 @@ initImGui();
        //scene.onKey(key, scancode, action, mode);
     }
 
-    private void initImGui()
+    private void initImGui() //user interface
     {
         //imgui code
         ImGui.createContext();
@@ -101,7 +101,7 @@ initImGui();
         ImFontConfig config=new ImFontConfig();
         config.setGlyphRanges(atlas.getGlyphRangesDefault());
         config.setPixelSnapH(true);
-        atlas.addFontFromFileTTF("./project/assets/Fonts/Scream_Real.ttf", 100);
+        atlas.addFontFromFileTTF("./project/assets/Fonts/Scream_Real.ttf", 100); //schriftart
 
         config.destroy();
 
@@ -115,7 +115,7 @@ initImGui();
     }
     public void renderImGuiContent()
     {
-        imGuiGlfw.newFrame();
+        imGuiGlfw.newFrame(); //hier wird ein neues fenster erstellt
         ImGui.newFrame();
         int window_flags = ImGuiWindowFlags.NoBackground;
         window_flags += ImGuiWindowFlags.NoTitleBar;
@@ -124,13 +124,13 @@ initImGui();
         window_flags += ImGuiWindowFlags.NoMove;
         if(!scene_two.levelSuccess) {
             ImGui.begin("new window", window_flags);
-            ImGui.setWindowPos("new window", 0, 0);
+            ImGui.setWindowPos("new window", 0, 0); //steht oben links
             ImGui.text("Score :");
             ImGui.end();
 
             ImGui.begin("scoreText", window_flags);
             ImGui.setWindowPos("scoreText", 250, 0);
-            ImGui.text(String.valueOf(Math.round(scene_two.score)));
+            ImGui.text(String.valueOf(Math.round(scene_two.score))); //die Scores werden aufgerundet(keine klmmerzahl)
             ImGui.end();
         }
 if(scene_two.levelSuccess) {

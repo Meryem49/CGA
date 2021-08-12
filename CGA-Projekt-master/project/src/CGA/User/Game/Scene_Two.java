@@ -17,6 +17,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -84,14 +85,14 @@ public class Scene_Two extends Application
 
 
             ground = ModelLoader.loadModel("project/assets/models/Ball_Game/Ground.obj", (float) Math.toRadians(0), (float) Math.toRadians(90.0f), 0.0f);
-            ground.position=new Vector3f(0,-10,-300);
+            ground.position=new Vector3f(0,-10,-300);  // setzen die Position für den Boden
             ground.computeMatrix();
 
             player = ModelLoader.loadModel("project/assets/models/Ball_Game/Player_Ball.obj", (float) Math.toRadians(0), (float) Math.toRadians(90.0f), 0.0f);
             player.position=new Vector3f(0,5,150);
             player.computeMatrix();
 
-            obstacles= new ArrayList<Renderable>();
+            obstacles= new ArrayList<Renderable>(); //eine arrayliste für die Balken
             obstacleOne = ModelLoader.loadModel("project/assets/models/Ball_Game/ObstacleOne.obj", (float) Math.toRadians(0), (float) Math.toRadians(90.0f), 0.0f);
             obstacleOne.position=new Vector3f(25,5,100);
             obstacleOne.computeMatrix();
@@ -137,15 +138,15 @@ public class Scene_Two extends Application
 
             successMark = ModelLoader.loadModel("project/assets/models/Ball_Game/ObstacleFull.obj", (float) Math.toRadians(0), (float) Math.toRadians(90.0f), 0.0f);
             successMark.position=new Vector3f(0,5,-700);
-            successMark.computeMatrix();
+            successMark.computeMatrix();  //ist die Ziellinie
 
 
             basicShader =new BasicShader("project/assets/shaders/Basic_Vert.glsl", "project/assets/shaders/Basic_Frag.glsl");
 
-            Vector3fc eye = new Vector3f(0.0f,25,200f);
+            Vector3fc eye = new Vector3f(0.0f,25,200f); //kameraposition, wie hoch, wo das Zentrum ist
             Vector3fc center = new Vector3f(0.0f,0.0f,0.0f);
             Vector3fc up = new Vector3f(0.0f,1.0f,0.0f);
-            viewMat = new Matrix4f();
+            viewMat = new Matrix4f(); //wie die kamera auf das objekt guckt
             projectionMat = new Matrix4f();
             viewMat=new Matrix4f().lookAt(eye,center,up);
             var fov = (float) Math.toRadians(60.0f);
@@ -160,9 +161,7 @@ public class Scene_Two extends Application
 
 
 
-            //test code starts here
 
-         //ends here
 
             return true;
         }
@@ -174,7 +173,7 @@ public class Scene_Two extends Application
 
     }
 
-    public  void render(float dt, float t)
+    public  void render(float dt, float t) //modelle werden auf das frame eingesetzt
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
        // glClearColor(0.1f,0.0f,0.3f,1);
@@ -189,9 +188,10 @@ public class Scene_Two extends Application
             modelmat.identity();
             Matrix4f mv = new Matrix4f();
 
+            //in die modelmatrix werden die objekte hinzugefügt
             modelmat.mul(ground.tMat, modelmat);
             viewMat.mul(modelmat, mv);
-            projectionMat.mul(mv, mvp);
+            projectionMat.mul(mv, mvp); //
             mvp.get(m4x4buf);
 
             glUniformMatrix4fv(basicShader.mvpLoc, false, m4x4buf);
@@ -208,6 +208,7 @@ public class Scene_Two extends Application
             modelmat.identity();
             mv = new Matrix4f();
 
+
             modelmat.mul(player.tMat, modelmat);
             modelmat.mul(scaleMat, modelmat);
             viewMat.mul(modelmat, mv);
@@ -223,8 +224,8 @@ public class Scene_Two extends Application
         {
            for(int i=0;i <obstacles.size();i++)
            {
-               var ob= obstacles.get(i);
-               Matrix4f modelmat = new Matrix4f();
+               var ob= obstacles.get(i); //weil mehrere obstacles vorhanden sind wird
+               Matrix4f modelmat = new Matrix4f(); //modelmatrix beschreibt größe position von den objekten
                mvp = new Matrix4f();
                modelmat.identity();
                Matrix4f mv = new Matrix4f();
@@ -240,7 +241,7 @@ public class Scene_Two extends Application
 
                glUniformMatrix4fv(basicShader.mvpLoc, false, m4x4buf);
                glUniform3f(basicShader.colorLoc, 1, 0, 0);
-               ob.render();
+               ob.render(); // wird anschließend gerendert
            }
 
             Matrix4f modelmat = new Matrix4f();
@@ -265,20 +266,25 @@ public class Scene_Two extends Application
 
         glDisableVertexAttribArray(basicShader.posLoc);
     }
-    public  void update(float dt, float t)
+    public  void update(float dt, float t) // ist die methode damit sich jedes mal das bild ändert.("wir gehen nicht mit ball, hindernisse kommen auf uns zu ")
     {
-        if(!stopGame) {
+        if(!stopGame) {  //die geschwindigkeit wird erhöht
             if(!levelSuccess)
                score += 0.1;
             movementSpeed += 0.0005f;
 
-            for (int i = 0; i < obstacles.size(); i++) {
+            for (int i = 0; i < obstacles.size(); i++) {  //update der position und movementspeed
                 var ob = obstacles.get(i);
 
                   ob.position.z += movementSpeed;
 
-                if (ob.position.z > 170 && score<250) {
-                    ob.position.z = -520;
+                  if (ob.position.z > 170 && score<250) {//falls gegenstand hinter dem spieler ist und 250 punkte noch nicht erreicht wurden
+                    Random rn = new Random();
+                    int n = -650 - -450 + 1;
+                    int x = rn.nextInt() % n;
+                    int randomNum =  -450 + x; //zufällige zahl zwischen -450 und -650
+                    ob.position.z = randomNum;  // poisiton von gegenstand zurücksetzen
+
                 }
                 var res = SphereRectCollision(player, ob);
                 if (res) {
@@ -287,9 +293,9 @@ public class Scene_Two extends Application
                 }
 
             }
-            if(score>250)
+            if(score>250) //position von ball, wenn das level erreicht  wird
                 successMark.position.z += movementSpeed;
-            var res = SphereRectCollision(player, successMark);
+            var res = SphereRectCollision(player, successMark); //überprüfung ob berürhung besteht
             if (res) {
                 System.out.println(res);
                 levelSuccess=true;
@@ -297,7 +303,7 @@ public class Scene_Two extends Application
             }
         }
 
-        if(startJump)
+        if(startJump) //leertaste.
         {
             amt= (float)Math.sin(Math.toRadians(ang));
             ang+=2.5;
@@ -317,7 +323,7 @@ public class Scene_Two extends Application
             }
             player.computeMatrix();
         }
-        if (window.getKeyState(GLFW_KEY_A)) {
+        if (window.getKeyState(GLFW_KEY_A)) { //-0.25 (links) so weit kann der ball nach links
            //move left
             player.position.x-=0.25;
             if(player.position.x<-25)
@@ -340,10 +346,10 @@ public class Scene_Two extends Application
     }
     public void cleanup() {
     }
-    boolean SphereRectCollision( Renderable sphere, Renderable rect)
+    boolean SphereRectCollision( Renderable sphere, Renderable rect) //prüfung ob ball gegen hindernis kommt
     {
-        float Width=50f/2,Height=8f/2,Depth=7.3f/2,Radius=2;
-        float sphereXDistance = Math.abs(sphere.position.x - rect.position.x);
+        float Width=50f/2,Height=8f/2,Depth=7.3f/2,Radius=2; //werte vom Ball und balken
+        float sphereXDistance = Math.abs(sphere.position.x - rect.position.x); //guckt wie weit von der x achse enternt ist, ist die distanz
         float sphereYDistance = Math.abs(sphere.position.y - rect.position.y);
         float sphereZDistance = Math.abs(sphere.position.z - rect.position.z);
 
@@ -361,7 +367,7 @@ public class Scene_Two extends Application
 
         return (cornerDistance_sq < (Radius * Radius));
     }
-    public void reset()
+    public void reset() //stellt alles wieder auf null. spiel beginnt von neu
     {
         obstacleOne.position=new Vector3f(25,5,100);
         obstacleTwo.position=new Vector3f(-25,5,0);
